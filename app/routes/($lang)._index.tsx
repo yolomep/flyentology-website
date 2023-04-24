@@ -114,7 +114,7 @@ export default function Homepage() {
 
   // TODO: skeletons vs placeholders
   const skeletons = getHeroPlaceholder([{}, {}, {}]);
-
+  // hero id: 7694132216043
   return (
     <>
       {primaryHero && (
@@ -228,6 +228,24 @@ const COLLECTION_HERO_QUERY = `#graphql
   @inContext(country: $country, language: $language) {
     hero: collection(handle: $handle) {
       ...CollectionContent
+    }
+  }
+`;
+
+const REWIRED_HERO_QUERY = `#graphql
+  ${MEDIA_FRAGMENT}
+  query getProductMedia($id: ID!) {
+    product(id: $id) {
+      id
+      media(first: 10) {
+        edges {
+          node {
+            mediaContentType
+            alt
+            ...mediaFieldsByType
+          }
+        }
+      }
     }
   }
 `;

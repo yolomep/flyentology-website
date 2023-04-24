@@ -19,7 +19,7 @@ import {ShopifySalesChannel, Seo} from '@shopify/hydrogen';
 import {Layout} from '~/components';
 import {GenericError} from './components/GenericError';
 import {NotFound} from './components/NotFound';
-import styles from './styles/app.css';
+import styles from './styles/global.css';
 import favicon from '../public/favicon.svg';
 import {seoPayload} from '~/lib/seo.server';
 import {
@@ -72,7 +72,7 @@ export async function loader({request, context}: LoaderArgs) {
 export default function App() {
   const data = useLoaderData<typeof loader>();
   const locale = data.selectedLocale ?? DEFAULT_LOCALE;
-  const hasUserConsent = true;
+  const hasUserConsent = true; //actually false lol
 
   useAnalytics(hasUserConsent, locale);
 
