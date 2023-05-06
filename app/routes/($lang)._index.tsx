@@ -1,7 +1,13 @@
 import {defer, type LoaderArgs} from '@shopify/remix-oxygen';
 import {Suspense} from 'react';
 import {Await, useLoaderData} from '@remix-run/react';
-import {ProductSwimlane, FeaturedCollections, Hero} from '~/components';
+import {
+  ProductSwimlane,
+  FeaturedCollections,
+  Hero,
+  Button,
+  Heading,
+} from '~/components';
 import {MEDIA_FRAGMENT, PRODUCT_CARD_FRAGMENT} from '~/data/fragments';
 import {getHeroPlaceholder} from '~/lib/placeholders';
 import {seoPayload} from '~/lib/seo.server';
@@ -12,6 +18,9 @@ import type {
 import {AnalyticsPageType} from '@shopify/hydrogen';
 import {routeHeaders, CACHE_SHORT} from '~/data/cache';
 import {type CollectionHero} from '~/components/Hero';
+import {FlyHero} from '~/components/FlyHero';
+import HeroImage from 'public/Rew_red_1.0.png';
+import {Section} from '~/components/Text';
 
 interface HomeSeoData {
   shop: {
@@ -38,8 +47,16 @@ export async function loader({params, context}: LoaderArgs) {
     hero: CollectionHero;
     shop: HomeSeoData;
   }>(HOMEPAGE_SEO_QUERY, {
-    variables: {handle: 'freestyle'},
+    variables: {handle: 'Homepage'},
   });
+
+  // const flyHero = await context.storefront.query<{
+  //   flyHero: MediaImage;
+  // }>(LARGE_HERO_QUERY, {
+  //   variables: {
+  //     id: 'gid://shopify/Product/7694132216043',
+  //   },
+  // });
 
   const seo = seoPayload.home();
 
@@ -47,6 +64,7 @@ export async function loader({params, context}: LoaderArgs) {
     {
       shop,
       primaryHero: hero,
+      //flyHero,
       // These different queries are separated to illustrate how 3rd party content
       // fetching can be optimized for both above and below the fold.
       featuredProducts: context.storefront.query<{
@@ -62,16 +80,16 @@ export async function loader({params, context}: LoaderArgs) {
           language,
         },
       }),
-      secondaryHero: context.storefront.query<{hero: CollectionHero}>(
-        COLLECTION_HERO_QUERY,
-        {
-          variables: {
-            handle: 'backcountry',
-            country,
-            language,
-          },
-        },
-      ),
+      // secondaryHero: context.storefront.query<{hero: CollectionHero}>(
+      //   COLLECTION_HERO_QUERY,
+      //   {
+      //     variables: {
+      //       handle: 'backcountry',
+      //       country,
+      //       language,
+      //     },
+      //   },
+      // ),
       featuredCollections: context.storefront.query<{
         collections: CollectionConnection;
       }>(FEATURED_COLLECTIONS_QUERY, {
@@ -80,16 +98,16 @@ export async function loader({params, context}: LoaderArgs) {
           language,
         },
       }),
-      tertiaryHero: context.storefront.query<{hero: CollectionHero}>(
-        COLLECTION_HERO_QUERY,
-        {
-          variables: {
-            handle: 'winter-2022',
-            country,
-            language,
-          },
-        },
-      ),
+      // tertiaryHero: context.storefront.query<{hero: CollectionHero}>(
+      //   COLLECTION_HERO_QUERY,
+      //   {
+      //     variables: {
+      //       handle: 'winter-2022',
+      //       country,
+      //       language,
+      //     },
+      //   },
+      // ),
       analytics: {
         pageType: AnalyticsPageType.home,
       },
@@ -106,21 +124,66 @@ export async function loader({params, context}: LoaderArgs) {
 export default function Homepage() {
   const {
     primaryHero,
-    secondaryHero,
-    tertiaryHero,
+    // secondaryHero,
+    // tertiaryHero,
     featuredCollections,
     featuredProducts,
+    //flyHero,
   } = useLoaderData<typeof loader>();
 
   // TODO: skeletons vs placeholders
-  const skeletons = getHeroPlaceholder([{}, {}, {}]);
+  //const skeletons = getHeroPlaceholder([{}, {}, {}]);
   // hero id: 7694132216043
   return (
     <>
-      {primaryHero && (
+      {/* {primaryHero && (
         <Hero {...primaryHero} height="full" top loading="eager" />
-      )}
+      )} */}
+      <div>
+        <img
+          src={HeroImage}
+          alt="crap"
+          style={{
+            width: '100vw',
+            opacity: '50%',
+            maxHeight: '750px',
+            objectFit: 'cover',
+            position: 'relative',
+          }}
+        />
+        <div
+          style={{
+            position: 'absolute',
+            bottom: '100px',
+            left: '50%',
+            transform: 'translate(-50%, 0)',
+          }}
+        >
+          <h2 style={{fontSize: '5em'}}>Flyentology</h2>
+          <Button
+            style={{
+              position: 'relative',
+              left: '50%',
+              transform: 'translate(-50%, 0)',
+            }}
+          >
+            Shop More
+          </Button>
+        </div>
+      </div>
+      <div className="mt-4">
+        <div className="text-center">
+          <Heading>Fly Art by Raf</Heading>
+        </div>
+        <p className="text-center">
+          Stickers, posters, clothing and more, made in a style you just
+          can&apos;t find anywhere else.
+        </p>
+      </div>
 
+      {/* <FlyHero image={HeroImage} /> */}
+      {/* {flyHero} */}
+      {/* {flyHero && <Hero {...flyHero} height="full" top loading="eager" />} */}
       {featuredProducts && (
         <Suspense>
           <Await resolve={featuredProducts}>
@@ -137,8 +200,7 @@ export default function Homepage() {
           </Await>
         </Suspense>
       )}
-
-      {secondaryHero && (
+      {/* {secondaryHero && (
         <Suspense fallback={<Hero {...skeletons[1]} />}>
           <Await resolve={secondaryHero}>
             {({hero}) => {
@@ -147,9 +209,8 @@ export default function Homepage() {
             }}
           </Await>
         </Suspense>
-      )}
-
-      {featuredCollections && (
+      )} */}
+      {/* {featuredCollections && (
         <Suspense>
           <Await resolve={featuredCollections}>
             {({collections}) => {
@@ -163,9 +224,8 @@ export default function Homepage() {
             }}
           </Await>
         </Suspense>
-      )}
-
-      {tertiaryHero && (
+      )} */}
+      {/* {tertiaryHero && (
         <Suspense fallback={<Hero {...skeletons[2]} />}>
           <Await resolve={tertiaryHero}>
             {({hero}) => {
@@ -174,7 +234,7 @@ export default function Homepage() {
             }}
           </Await>
         </Suspense>
-      )}
+      )} */}
     </>
   );
 }
@@ -232,23 +292,23 @@ const COLLECTION_HERO_QUERY = `#graphql
   }
 `;
 
-const REWIRED_HERO_QUERY = `#graphql
-  ${MEDIA_FRAGMENT}
-  query getProductMedia($id: ID!) {
-    product(id: $id) {
-      id
-      media(first: 10) {
-        edges {
-          node {
-            mediaContentType
-            alt
-            ...mediaFieldsByType
-          }
-        }
-      }
-    }
-  }
-`;
+// const REWIRED_HERO_QUERY = `#graphql
+//   ${MEDIA_FRAGMENT}
+//   query getProductMedia($id: ID!) {
+//     product(id: $id) {
+//       id
+//       media(first: 10) {
+//         edges {
+//           node {
+//             mediaContentType
+//             alt
+//             ...mediaFieldsByType
+//           }
+//         }
+//       }
+//     }
+//   }
+// `;
 
 // @see: https://shopify.dev/api/storefront/2023-04/queries/products
 export const HOMEPAGE_FEATURED_PRODUCTS_QUERY = `#graphql
@@ -284,4 +344,22 @@ export const FEATURED_COLLECTIONS_QUERY = `#graphql
       }
     }
   }
+`;
+
+export const LARGE_HERO_QUERY = `#graphql
+${MEDIA_FRAGMENT}
+query getHeroMedia($id: ID!) {
+  product(id: $id) {
+    id
+    media {
+      edges {
+        node {
+          mediaContentType
+          alt
+          ...Media
+        }
+      }
+    }
+  }
+}
 `;
